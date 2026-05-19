@@ -51,9 +51,9 @@ header {
 .tab-btn {
   flex: 1; padding: 12px 0;
   background: none; border: none;
-  color: #000000; font-size: 11px;
+  color: #000000; font-size: 10px;
   font-family: 'Cinzel', serif;
-  letter-spacing: 1.5px;
+  letter-spacing: 1px;
   text-transform: uppercase;
   cursor: pointer;
   border-bottom: 2px solid transparent;
@@ -339,6 +339,7 @@ textarea::placeholder { color: #b8a880; font-style: italic; }
 
 <div class="tabs">
   <button class="tab-btn active" onclick="showTab('guide',this)">Guide</button>
+  <button class="tab-btn" onclick="showTab('booklet',this)">Booklet</button>
   <button class="tab-btn" onclick="showTab('listen',this)">Listen</button>
   <button class="tab-btn" onclick="showTab('journal',this)">Journal</button>
   <button class="tab-btn" onclick="showTab('about',this)">About</button>
@@ -436,7 +437,10 @@ textarea::placeholder { color: #b8a880; font-style: italic; }
     <div class="guide-step"><div class="guide-step-num">7</div><div class="guide-text">There is no right or wrong way to use this practice. You might choose to practise daily, weekly, or whenever you need some time to restore and reset. The more you practise, the easier it becomes to access a calm, focused state.</div></div>
   </div>
 
-  <div class="divider"></div>
+</div>
+
+<!-- BOOKLET -->
+<div id="panel-booklet" class="panel">
 
   <div class="guide-section">
     <div class="guide-title">Introduction to Hypnosis and Hypnotic Meditation</div>
