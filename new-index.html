@@ -1,0 +1,700 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>My Hypnotic Meditation Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Cinzel:wght@300;400&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: #faf8f3;
+  color: #2a2218;
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  min-height: 100vh;
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+header {
+  padding: 20px 20px 14px;
+  border-bottom: 1px solid #e0d8b8;
+  text-align: center;
+}
+
+.header-title {
+  font-family: 'Cinzel', serif;
+  font-size: 15px;
+  font-weight: 300;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: #c4a020;
+  line-height: 1.5;
+}
+
+.header-sub {
+  font-size: 12px;
+  color: #2a1e08;
+  letter-spacing: 1px;
+  margin-top: 4px;
+  font-style: italic;
+}
+
+.tabs {
+  display: flex;
+  border-bottom: 1px solid #e0d8b8;
+  background: #faf8f3;
+  position: sticky; top: 0; z-index: 10;
+}
+
+.tab-btn {
+  flex: 1; padding: 12px 0;
+  background: none; border: none;
+  color: #2a1e08; font-size: 11px;
+  font-family: 'Cinzel', serif;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: color 0.2s, border-color 0.2s;
+}
+.tab-btn.active { color: #c4a020; border-bottom-color: #c4a020; }
+
+.panel { display: none; padding: 24px 16px 100px; }
+.panel.active { display: block; }
+
+/* ── AUDIO PLAYER ── */
+.track-card {
+  background: #f0ece0;
+  border: 1px solid #ddd4b0;
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 16px;
+  transition: border-color 0.3s;
+}
+.track-card.playing { border-color: #c4a020; }
+
+.track-name {
+  font-family: 'Cinzel', serif;
+  font-size: 12px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #c4a020;
+  margin-bottom: 4px;
+}
+.track-desc {
+  font-size: 13px;
+  color: #2a1e08;
+  font-style: italic;
+  margin-bottom: 16px;
+  line-height: 1.5;
+}
+
+.player-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.play-btn {
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  border: 1px solid #c4a020;
+  background: rgba(196,160,32,0.10);
+  color: #c4a020;
+  font-size: 16px;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+.play-btn:active { background: rgba(196,160,32,0.25); }
+
+.time-display {
+  font-size: 11px;
+  color: #2a1e08;
+  font-family: 'Cinzel', serif;
+  white-space: nowrap;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 3px;
+  background: #ddd4b0;
+  border-radius: 2px;
+  cursor: pointer;
+  position: relative;
+}
+.progress-fill {
+  height: 100%;
+  background: #c4a020;
+  border-radius: 2px;
+  width: 0%;
+  transition: width 0.1s linear;
+  pointer-events: none;
+}
+
+.track-note {
+  font-size: 11px;
+  color: #4a3810;
+  font-style: italic;
+  margin-top: 10px;
+  line-height: 1.5;
+}
+
+/* ── JOURNAL ── */
+.prompt-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+.prompt-counter {
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: #2a1e08;
+  text-align: center;
+}
+.nav-btn {
+  background: none;
+  border: 1px solid #ddd4b0;
+  border-radius: 8px;
+  color: #c4a020;
+  padding: 8px 14px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+.nav-btn:active { border-color: #c4a020; }
+.nav-btn:disabled { color: #e0d8b8; border-color: #f0ece0; cursor: default; }
+
+.prompt-section-label {
+  font-family: 'Cinzel', serif;
+  font-size: 10px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: #c4a020;
+  opacity: 0.6;
+  text-align: center;
+  margin-bottom: 12px;
+}
+
+.prompt-card {
+  background: #f0ece0;
+  border: 1px solid #ddd4b0;
+  border-radius: 16px;
+  padding: 24px 20px;
+  margin-bottom: 20px;
+  text-align: center;
+  min-height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.prompt-text-display {
+  font-size: 18px;
+  font-style: italic;
+  line-height: 1.7;
+  color: #2a2218;
+  font-weight: 300;
+}
+
+.journal-label {
+  font-family: 'Cinzel', serif;
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #2a1e08;
+  margin-bottom: 8px;
+  display: block;
+}
+
+textarea {
+  width: 100%;
+  background: #f0ece0;
+  border: 1px solid #ddd4b0;
+  border-radius: 12px;
+  color: #2a2218;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 16px;
+  padding: 16px;
+  resize: none;
+  min-height: 160px;
+  line-height: 1.7;
+  transition: border-color 0.2s;
+}
+textarea:focus { outline: none; border-color: #c4a020; }
+textarea::placeholder { color: #b8a880; font-style: italic; }
+
+.save-indicator {
+  position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+  background: #f0ece0; border: 1px solid #c4a020; color: #c4a020;
+  padding: 8px 20px; border-radius: 20px; font-size: 12px;
+  font-family: 'Cinzel', serif; letter-spacing: 1px;
+  opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 100;
+}
+.save-indicator.show { opacity: 1; }
+
+/* ── GUIDE ── */
+.guide-section {
+  margin-bottom: 32px;
+}
+.guide-title {
+  font-family: 'Cinzel', serif;
+  font-size: 12px;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: #c4a020;
+  margin-bottom: 14px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #e0d8b8;
+}
+.guide-text {
+  font-size: 16px;
+  line-height: 1.85;
+  color: #1a1208;
+  font-weight: 300;
+}
+.guide-text em { color: #2a2218; font-style: italic; }
+.guide-text strong { color: #c4a020; font-weight: 400; }
+
+.guide-step {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 12px;
+  align-items: flex-start;
+}
+.guide-step-num {
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  color: #c4a020;
+  opacity: 0.6;
+  flex-shrink: 0;
+  margin-top: 3px;
+  width: 20px;
+}
+
+.ornament {
+  text-align: center;
+  color: #4a3810;
+  font-size: 14px;
+  letter-spacing: 8px;
+  margin: 24px 0;
+}
+
+.script-box {
+  background: #f0ece0;
+  border: 1px solid #ddd4b0;
+  border-left: 3px solid #c4a020;
+  border-radius: 0 12px 12px 0;
+  padding: 20px;
+  font-size: 15px;
+  font-style: italic;
+  line-height: 2;
+  color: #1a1208;
+  margin-top: 12px;
+}
+
+/* ── ABOUT ── */
+.about-card {
+  background: #f0ece0;
+  border: 1px solid #ddd4b0;
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 16px;
+}
+.about-card-title {
+  font-family: 'Cinzel', serif;
+  font-size: 12px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #c4a020;
+  margin-bottom: 10px;
+}
+.about-card-text {
+  font-size: 15px;
+  color: #1a1208;
+  line-height: 1.75;
+}
+.about-heart {
+  text-align: center;
+  font-size: 28px;
+  padding: 24px 0 16px;
+  opacity: 0.5;
+}
+
+.divider { height: 1px; background: #e0d8b8; margin: 8px 0 24px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-title">My Hypnotic Meditation Guide</div>
+  <div class="header-sub">Barbara Ford-Hammond</div>
+</header>
+
+<div class="tabs">
+  <button class="tab-btn active" onclick="showTab('guide',this)">Guide</button>
+  <button class="tab-btn" onclick="showTab('listen',this)">Listen</button>
+  <button class="tab-btn" onclick="showTab('journal',this)">Journal</button>
+  <button class="tab-btn" onclick="showTab('about',this)">About</button>
+</div>
+
+<!-- LISTEN -->
+<div id="panel-listen" class="panel">
+
+  <div class="track-card" id="track-0">
+    <div class="track-name">Your Special Place</div>
+    <div class="track-desc">A restful spoken induction guiding you to your own inner sanctuary</div>
+    <div class="player-controls">
+      <button class="play-btn" onclick="togglePlay(0)"><span id="icon-0">▶</span></button>
+      <span class="time-display"><span id="cur-0">0:00</span> / <span id="dur-0">--:--</span></span>
+    </div>
+    <div class="progress-bar" onclick="seek(0, event)"><div class="progress-fill" id="prog-0"></div></div>
+    <div class="track-note">Use headphones for the best experience. You may drift into sleep — that is perfectly fine.</div>
+    <audio id="audio-0" src="https://archive.org/download/bfh-hypnotic-meditation-tracks/Your+Special+Place.mp3" preload="none"></audio>
+  </div>
+
+  <div class="track-card" id="track-1">
+    <div class="track-name">Distant Light</div>
+    <div class="track-desc">60 minutes of pure meditation music — no binaural tones</div>
+    <div class="player-controls">
+      <button class="play-btn" onclick="togglePlay(1)"><span id="icon-1">▶</span></button>
+      <span class="time-display"><span id="cur-1">0:00</span> / <span id="dur-1">--:--</span></span>
+    </div>
+    <div class="progress-bar" onclick="seek(1, event)"><div class="progress-fill" id="prog-1"></div></div>
+    <div class="track-note">Play as background music for reading, journalling or simply resting.</div>
+    <audio id="audio-1" src="https://archive.org/download/bfh-hypnotic-meditation-tracks/Meditation+Music+Distant+Light+60-mins.mp3" preload="none"></audio>
+  </div>
+
+  <div class="track-card" id="track-2">
+    <div class="track-name">Alpha Binaural Wave</div>
+    <div class="track-desc">20 minutes — supports relaxed, calm awareness</div>
+    <div class="player-controls">
+      <button class="play-btn" onclick="togglePlay(2)"><span id="icon-2">▶</span></button>
+      <span class="time-display"><span id="cur-2">0:00</span> / <span id="dur-2">--:--</span></span>
+    </div>
+    <div class="progress-bar" onclick="seek(2, event)"><div class="progress-fill" id="prog-2"></div></div>
+    <div class="track-note">Headphones required for binaural effect. Alpha waves support gentle, wakeful relaxation.</div>
+    <audio id="audio-2" src="https://archive.org/download/bfh-hypnotic-meditation-tracks/Alpha+Binaural+Wave+20-mins.mp3" preload="none"></audio>
+  </div>
+
+  <div class="track-card" id="track-3">
+    <div class="track-name">Theta Binaural Wave</div>
+    <div class="track-desc">20 minutes — supports deep meditation and inner stillness</div>
+    <div class="player-controls">
+      <button class="play-btn" onclick="togglePlay(3)"><span id="icon-3">▶</span></button>
+      <span class="time-display"><span id="cur-3">0:00</span> / <span id="dur-3">--:--</span></span>
+    </div>
+    <div class="progress-bar" onclick="seek(3, event)"><div class="progress-fill" id="prog-3"></div></div>
+    <div class="track-note">Headphones required. Theta waves are associated with deep meditation, creativity and the threshold of sleep.</div>
+    <audio id="audio-3" src="https://archive.org/download/bfh-hypnotic-meditation-tracks/Theta+Binaural+Wave+20-mins.mp3" preload="none"></audio>
+  </div>
+
+</div>
+
+<!-- JOURNAL -->
+<div id="panel-journal" class="panel">
+  <div class="prompt-nav">
+    <button class="nav-btn" id="prev-btn" onclick="prevPrompt()">←</button>
+    <div class="prompt-counter">
+      <div id="prompt-num">Prompt 1 of 28</div>
+    </div>
+    <button class="nav-btn" id="next-btn" onclick="nextPrompt()">→</button>
+  </div>
+
+  <div class="prompt-section-label" id="prompt-section"></div>
+
+  <div class="prompt-card">
+    <div class="prompt-text-display" id="prompt-display"></div>
+  </div>
+
+  <span class="journal-label">Your thoughts</span>
+  <textarea id="journal-entry" placeholder="Write freely here… there are no rules." oninput="saveJournalEntry()"></textarea>
+</div>
+
+<!-- GUIDE -->
+<div id="panel-guide" class="panel active">
+
+  <div class="guide-section">
+    <div class="guide-title">How to Use This Guide</div>
+    <div class="guide-text">
+      This guide is your personal companion to hypnotic meditation. The techniques here can create a template of a powerful tool for calming your mind, easing your body and reconnecting with your inner self.<br><br>
+      Over time you might not need or want to go through all the steps. Please be <em>you</em> and use whatever works best.
+    </div>
+    <div class="ornament">✦ ✦ ✦</div>
+    <div class="guide-step"><div class="guide-step-num">1</div><div class="guide-text">Be in a quiet and comfortable place where you will not be disturbed. Ensure you feel warm enough.</div></div>
+    <div class="guide-step"><div class="guide-step-num">2</div><div class="guide-text">Decide if you would like to read through a section, follow the script, or simply rest while listening to the music.</div></div>
+    <div class="guide-step"><div class="guide-step-num">3</div><div class="guide-text">Start a binaural track. Use headphones if possible, as they enhance the effect by delivering separate tones to each ear, helping your brain shift into a relaxed state.</div></div>
+    <div class="guide-step"><div class="guide-step-num">4</div><div class="guide-text">Follow the relaxation and deepening techniques, or simply let the audio guide you.</div></div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="guide-section">
+    <div class="guide-title">Introduction to Hypnotic Meditation</div>
+    <div class="guide-text">
+      Hypnotic meditation is widely used for sport, stress management and healing. More and more people are learning and using hypnotic techniques as tools for self-improvement and change.<br><br>
+      Learning hypnosis is something everyone can do — it is a natural state that we all slip in and out of frequently throughout each day. The trance state is already familiar to us all.<br><br>
+      Can you think of a time when you were in your car and, on arrival at your destination, realised you had <em>'forgotten'</em> parts of the journey? Have you ever been so completely absorbed in a book or film that time slipped away? That is the natural trance state.
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="guide-section">
+    <div class="guide-title">How Do You Think?</div>
+    <div class="guide-text">
+      Not everybody visualises. It is useful to be aware of how your thought processes work so that you can create successful hypnotic techniques that are relevant to <em>you</em>.<br><br>
+      <strong>Visual thinkers</strong> — see pictures in their mind<br><br>
+      <strong>Thinking thinkers</strong> — think of things without seeing images<br><br>
+      <strong>Feeling thinkers</strong> — describe things by how they feel<br><br>
+      <strong>Auditory thinkers</strong> — hear their thoughts or talk to themselves internally<br><br>
+      All are equally valid. Adapt the techniques to suit the way <em>you</em> naturally think.
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="guide-section">
+    <div class="guide-title">Relaxing</div>
+    <div class="guide-text">
+      Begin to pay attention to your breathing. Try to make the out-breath last a little longer than the in-breath. Only do this in a way that feels comfortable for you.<br><br>
+      As you begin to breathe more steadily, imagine a wave of relaxation washing over you and through you with every breath.<br><br>
+      Begin to think of a comforting word — one that brings a sense of calm. Let this word gently repeat in your mind as you breathe out.
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="guide-section">
+    <div class="guide-title">Deepening</div>
+    <div class="guide-text">
+      The next stage is deepening. Some people are content to feel a little relaxed while others prefer to go deeper. Try a few ways to find which you prefer:<br><br>
+      ✦ &nbsp;Counting down from 10 to 1<br><br>
+      ✦ &nbsp;Imagining watching something floating down, such as a leaf<br><br>
+      ✦ &nbsp;Repeating words like <em>"deeper and deeper"</em><br><br>
+      ✦ &nbsp;Saying a particular word to yourself as you breathe out, such as <em>"calm"</em><br><br>
+      When you are at a level that feels right, imagine you are in a special place. Make it as real as you can.
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="guide-section">
+    <div class="guide-title">The Script</div>
+    <div class="guide-text">This script mirrors the <em>Your Special Place</em> audio. You can memorise it, record it, or have someone read it to you. Pause at… the… ellipses…</div>
+    <div class="script-box">
+      Make yourself comfortable. Ensure that you are warm enough and feel settled.<br><br>
+      Begin to pay attention to your breathing. Try to make the out-breath last a little longer than the in-breath…<br><br>
+      Focus your attention on just you…<br><br>
+      As you begin to breathe more steadily, imagine a wave of relaxation washing over you and through you with every breath…<br><br>
+      Begin to think of a comforting word… one that brings a sense of calm… Let this word gently repeat in your mind as you breathe out…<br><br>
+      1 … resting … relaxing … resting … relaxing…<br>
+      2 … breathing gently … relaxing more and more with every breath…<br>
+      3 … softening … caressed in peace…<br>
+      4 … breathe away any tensions or anxieties…<br>
+      5 … rest … relax … calm…<br>
+      6 … breathing easy … soothed…<br>
+      7 … resting more and more deeply…<br>
+      8 … inner peace washing over you…<br>
+      9 … deeper and deeper into stillness…<br>
+      10 … you have arrived at your special place… all is well…<br><br>
+      When you are ready… gently… in your own time… return.
+    </div>
+  </div>
+
+</div>
+
+<!-- ABOUT -->
+<div id="panel-about" class="panel">
+  <div class="about-heart">✦</div>
+  <div class="about-card">
+    <div class="about-card-title">About This Package</div>
+    <div class="about-card-text">
+      My Hypnotic Meditation Guide is a complete toolkit for calming your mind, easing your body and reconnecting with your inner self — created by Barbara Ford-Hammond, hypnotherapist.
+    </div>
+  </div>
+  <div class="about-card">
+    <div class="about-card-title">What Is Included</div>
+    <div class="about-card-text">
+      🎵 &nbsp;Your Special Place — guided hypnotic meditation<br><br>
+      🎵 &nbsp;Distant Light — 60 minutes of meditation music<br><br>
+      🎵 &nbsp;Alpha Binaural Wave — 20 minutes<br><br>
+      🎵 &nbsp;Theta Binaural Wave — 20 minutes<br><br>
+      📖 &nbsp;The complete guide to hypnotic meditation<br><br>
+      ✍️ &nbsp;28 journal prompts across four themes
+    </div>
+  </div>
+  <div class="about-card">
+    <div class="about-card-title">How To Use</div>
+    <div class="about-card-text">
+      <strong style="color:#c4a020">Read &amp; practise</strong> — use the Guide tab alone, with or without music playing.<br><br>
+      <strong style="color:#c4a020">Listen &amp; follow</strong> — play Your Special Place and let Barbara's voice guide you.<br><br>
+      <strong style="color:#c4a020">Combine both</strong> — familiarise yourself with the guide first, then use the audio to deepen your practice.<br><br>
+      <strong style="color:#c4a020">Journal</strong> — work through the 28 prompts at whatever pace feels right.
+    </div>
+  </div>
+  <div class="about-card">
+    <div class="about-card-title">Privacy</div>
+    <div class="about-card-text">
+      Your journal entries are saved privately on your device only. Nothing is sent anywhere.
+    </div>
+  </div>
+  <div class="about-card">
+    <div class="about-card-title">barbaraford-hammond.com</div>
+    <div class="about-card-text">
+      Created with care by Barbara Ford-Hammond — hypnotherapist, crone, writer.
+    </div>
+  </div>
+</div>
+
+<div class="save-indicator" id="save-indicator">Saved ✦</div>
+
+<script>
+// ── Audio ──────────────────────────────────────────────────────────────────
+let currentTrack = null;
+
+function togglePlay(i) {
+  const audio = document.getElementById('audio-' + i);
+  const icon = document.getElementById('icon-' + i);
+  const card = document.getElementById('track-' + i);
+
+  if (currentTrack !== null && currentTrack !== i) {
+    const prev = document.getElementById('audio-' + currentTrack);
+    prev.pause();
+    document.getElementById('icon-' + currentTrack).textContent = '▶';
+    document.getElementById('track-' + currentTrack).classList.remove('playing');
+  }
+
+  if (audio.paused) {
+    audio.play();
+    icon.textContent = '⏸';
+    card.classList.add('playing');
+    currentTrack = i;
+  } else {
+    audio.pause();
+    icon.textContent = '▶';
+    card.classList.remove('playing');
+    currentTrack = null;
+  }
+}
+
+function seek(i, e) {
+  const audio = document.getElementById('audio-' + i);
+  const bar = e.currentTarget;
+  const rect = bar.getBoundingClientRect();
+  const pct = (e.clientX - rect.left) / rect.width;
+  if (audio.duration) audio.currentTime = pct * audio.duration;
+}
+
+function fmt(s) {
+  if (!s || isNaN(s)) return '--:--';
+  const m = Math.floor(s / 60);
+  const sec = Math.floor(s % 60);
+  return m + ':' + (sec < 10 ? '0' : '') + sec;
+}
+
+for (let i = 0; i < 4; i++) {
+  (function(idx) {
+    const audio = document.getElementById('audio-' + idx);
+    audio.addEventListener('timeupdate', () => {
+      document.getElementById('cur-' + idx).textContent = fmt(audio.currentTime);
+      if (audio.duration) {
+        document.getElementById('prog-' + idx).style.width = (audio.currentTime / audio.duration * 100) + '%';
+      }
+    });
+    audio.addEventListener('loadedmetadata', () => {
+      document.getElementById('dur-' + idx).textContent = fmt(audio.duration);
+    });
+    audio.addEventListener('ended', () => {
+      document.getElementById('icon-' + idx).textContent = '▶';
+      document.getElementById('track-' + idx).classList.remove('playing');
+      document.getElementById('prog-' + idx).style.width = '0%';
+      currentTrack = null;
+    });
+  })(i);
+}
+
+// ── Journal ────────────────────────────────────────────────────────────────
+const PROMPTS = [
+  { section: 'Awareness & Intention', text: 'What does relaxation mean to me today?' },
+  { section: 'Awareness & Intention', text: 'How do I know when my mind or body is tense?' },
+  { section: 'Awareness & Intention', text: 'What would I most like to change or support in myself?' },
+  { section: 'Awareness & Intention', text: 'How do I feel before and after listening to the audio track?' },
+  { section: 'Awareness & Intention', text: 'What word or phrase can I choose as a personal calming anchor?' },
+  { section: 'Awareness & Intention', text: 'In what ways am I already improving, even if subtly?' },
+  { section: 'Awareness & Intention', text: 'What intention do I want to carry into next week?' },
+  { section: 'Patterns & Possibility', text: 'What thoughts or habits do I notice recurring?' },
+  { section: 'Patterns & Possibility', text: 'How do I usually respond to stress, and how might I respond differently?' },
+  { section: 'Patterns & Possibility', text: 'What small moment of calmness stood out to me this week?' },
+  { section: 'Patterns & Possibility', text: 'How does my sleep feel lately? Are there patterns?' },
+  { section: 'Patterns & Possibility', text: 'What self-talk is helping me — what might I rewrite?' },
+  { section: 'Patterns & Possibility', text: 'Describe one moment this week when I felt proud of myself.' },
+  { section: 'Patterns & Possibility', text: 'What would feeling more free or peaceful look like in daily life?' },
+  { section: 'Connection & Clarity', text: 'What do I appreciate about myself right now?' },
+  { section: 'Connection & Clarity', text: 'In what ways do I feel more connected to my inner self?' },
+  { section: 'Connection & Clarity', text: 'What beliefs am I noticing or changing?' },
+  { section: 'Connection & Clarity', text: 'What kind of thoughts do I wake up with most mornings?' },
+  { section: 'Connection & Clarity', text: 'If I met a calmer version of myself, what advice would they offer me?' },
+  { section: 'Connection & Clarity', text: 'What kind of environments or experiences help me thrive?' },
+  { section: 'Connection & Clarity', text: 'What insight is slowly becoming clear to me?' },
+  { section: 'Integration & Growth', text: 'How has my relationship with stillness or silence changed?' },
+  { section: 'Integration & Growth', text: 'What part of this practice feels easiest? What feels challenging?' },
+  { section: 'Integration & Growth', text: 'In what ways do I feel stronger, or more "me"?' },
+  { section: 'Integration & Growth', text: 'What would it feel like to fully trust the experience that I am in?' },
+  { section: 'Integration & Growth', text: 'How do I celebrate small inner wins?' },
+  { section: 'Integration & Growth', text: 'What might be my next action or intention?' },
+  { section: 'Integration & Growth', text: 'What do I want to carry forward with me in my life?' },
+];
+
+const JOURNAL_KEY = 'meditation-journal';
+let currentPrompt = 0;
+let saveTimer = null;
+
+function getJournalData() {
+  try { return JSON.parse(localStorage.getItem(JOURNAL_KEY) || '{}'); }
+  catch { return {}; }
+}
+
+function renderPrompt() {
+  const p = PROMPTS[currentPrompt];
+  document.getElementById('prompt-display').textContent = p.text;
+  document.getElementById('prompt-section').textContent = p.section;
+  document.getElementById('prompt-num').textContent = 'Prompt ' + (currentPrompt + 1) + ' of 28';
+  document.getElementById('prev-btn').disabled = currentPrompt === 0;
+  document.getElementById('next-btn').disabled = currentPrompt === PROMPTS.length - 1;
+  const data = getJournalData();
+  document.getElementById('journal-entry').value = data[currentPrompt] || '';
+}
+
+function prevPrompt() { if (currentPrompt > 0) { currentPrompt--; renderPrompt(); } }
+function nextPrompt() { if (currentPrompt < PROMPTS.length - 1) { currentPrompt++; renderPrompt(); } }
+
+function saveJournalEntry() {
+  const data = getJournalData();
+  data[currentPrompt] = document.getElementById('journal-entry').value;
+  localStorage.setItem(JOURNAL_KEY, JSON.stringify(data));
+  const ind = document.getElementById('save-indicator');
+  ind.classList.add('show');
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(() => ind.classList.remove('show'), 1400);
+}
+
+// ── Tabs ───────────────────────────────────────────────────────────────────
+function showTab(tab, btn) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('panel-' + tab).classList.add('active');
+  btn.classList.add('active');
+}
+
+renderPrompt();
+</script>
+</body>
+</html>
