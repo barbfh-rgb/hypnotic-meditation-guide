@@ -359,6 +359,25 @@ textarea::placeholder { color: #b8a880; font-style: italic; }
   opacity: 0.5;
 }
 
+.records-btns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 16px;
+}
+.records-btn {
+  background: #fdf7dc;
+  border: 1px solid #ddd4b0;
+  border-radius: 10px;
+  color: #1a1000;
+  padding: 10px 16px;
+  font-family: inherit;
+  font-size: 14px;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+.records-btn:active { border-color: #1a1000; }
+
 .divider { height: 1px; background: #e0d8b8; margin: 8px 0 24px; }
   /* ─── passcode gate (casual privacy only, not real security) ─── */
   body.is-locked > *:not(.gate){ display:none; }
@@ -709,9 +728,24 @@ textarea::placeholder { color: #b8a880; font-style: italic; }
     </div>
   </div>
   <div class="about-card">
+    <div class="about-card-title">Your Journal Records</div>
+    <div class="about-card-text">
+      Everything you write is held on this device only. Keep a backup so nothing is lost if you change phone, clear your browser or reinstall the app.<br><br>
+      <strong style="color:#1a1000">Save a backup</strong> creates a small file of all your journal entries. On a phone you will be offered the share sheet, so you can send it to your files, your cloud storage or your own email. On a computer it lands in your downloads folder. Do this every few weeks.<br><br>
+      <strong style="color:#1a1000">Restore from a backup</strong> lets you choose a backup file you saved earlier and your entries come back. Anything already written on those prompts is replaced, everything else is kept.<br><br>
+      <strong style="color:#1a1000">Print or save as PDF</strong> opens all 28 prompts with your entries ready to print, or choose "Save as PDF" in the print dialogue to keep a readable copy.
+      <div class="records-btns">
+        <button class="records-btn" type="button" onclick="exportJournal()">Save a backup</button>
+        <button class="records-btn" type="button" onclick="document.getElementById('import-file').click()">Restore from a backup</button>
+        <button class="records-btn" type="button" onclick="printJournal()">Print or save as PDF</button>
+      </div>
+      <input type="file" id="import-file" accept="application/json,.json" style="display:none" onchange="importJournal(this)">
+    </div>
+  </div>
+  <div class="about-card">
     <div class="about-card-title">Privacy</div>
     <div class="about-card-text">
-      All your data is saved privately on your device only. Nothing is sent anywhere.
+      All your data is saved privately on your device only. Nothing is sent anywhere, so do save yourself a backup now and then.
     </div>
   </div>
   <div class="about-card">
@@ -853,6 +887,104 @@ function saveJournalEntry() {
   ind.classList.add('show');
   clearTimeout(saveTimer);
   saveTimer = setTimeout(() => ind.classList.remove('show'), 1400);
+}
+
+// ── Backup, restore, print ─────────────────────────────────────────────────
+// Everything lives in this browser. These three let you keep a copy of it.
+function collectAll() {
+  return {
+    app: 'hypnotic-meditation-guide',
+    version: 1,
+    exported: new Date().toISOString(),
+    journal: getJournalData(),
+  };
+}
+
+function exportJournal() {
+  const d = new Date();
+  const stamp = d.getFullYear() + '-' +
+    String(d.getMonth() + 1).padStart(2, '0') + '-' +
+    String(d.getDate()).padStart(2, '0');
+  const name = 'meditation-journal-' + stamp + '.json';
+  const text = JSON.stringify(collectAll(), null, 2);
+  // On a phone the share sheet is friendlier than a download.
+  try {
+    const file = new File([text], name, { type: 'application/json' });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      navigator.share({ files: [file], title: 'Meditation journal backup' }).catch(() => {});
+      return;
+    }
+  } catch (e) { /* fall through to download */ }
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([text], { type: 'application/json' }));
+  a.download = name;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+}
+
+function importJournal(input) {
+  const file = input.files && input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    let data;
+    try { data = JSON.parse(reader.result); }
+    catch (e) { alert('That file could not be read.'); input.value = ''; return; }
+    if (!data || data.app !== 'hypnotic-meditation-guide' || !data.journal) {
+      alert('That does not look like a Meditation Guide backup.');
+      input.value = '';
+      return;
+    }
+    const count = Object.keys(data.journal).filter(k => (data.journal[k] || '').trim()).length;
+    if (!confirm('Restore ' + count + (count === 1 ? ' entry' : ' entries') +
+                 '?\n\nAnything already written on those prompts will be replaced. Everything else is kept.')) {
+      input.value = '';
+      return;
+    }
+    // Merge rather than wipe, so restoring never loses what is already here.
+    const all = getJournalData();
+    Object.keys(data.journal).forEach(k => { all[k] = data.journal[k]; });
+    localStorage.setItem(JOURNAL_KEY, JSON.stringify(all));
+    input.value = '';
+    renderPrompt();
+    alert('Your journal has been restored.');
+  };
+  reader.readAsText(file);
+}
+
+function printJournal() {
+  const data = getJournalData();
+  const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  let body = '';
+  let lastSection = '';
+  PROMPTS.forEach((p, i) => {
+    const entry = (data[i] || '').trim();
+    if (!entry) return;
+    if (p.section !== lastSection) {
+      body += '<h2>' + esc(p.section) + '</h2>';
+      lastSection = p.section;
+    }
+    body += '<div class="item"><div class="q">' + (i + 1) + '. ' + esc(p.text) + '</div>' +
+            '<div class="a">' + esc(entry).replace(/\n/g, '<br>') + '</div></div>';
+  });
+  if (!body) { alert('There is nothing written yet to print.'); return; }
+  const w = window.open('', '_blank');
+  if (!w) { alert('Your browser blocked the print window. Allow pop-ups for this app and try again.'); return; }
+  w.document.write(
+    '<!doctype html><html><head><meta charset="utf-8"><title>My Meditation Journal</title>' +
+    '<style>body{font-family:Georgia,serif;color:#1a1000;max-width:700px;margin:40px auto;padding:0 24px;line-height:1.7}' +
+    'h1{font-size:22px;letter-spacing:2px;text-transform:uppercase}' +
+    'h2{font-size:13px;letter-spacing:2px;text-transform:uppercase;margin-top:32px;border-bottom:1px solid #ddd4b0;padding-bottom:6px}' +
+    '.item{margin:18px 0;page-break-inside:avoid}.q{font-style:italic;color:#5a4a2e}.a{margin-top:6px;white-space:normal}' +
+    '.foot{margin-top:40px;font-size:12px;opacity:0.6}</style></head><body>' +
+    '<h1>My Meditation Journal</h1>' + body +
+    '<div class="foot">Barbara Ford-Hammond ~ barbaraford-hammond.com</div>' +
+    '</body></html>'
+  );
+  w.document.close();
+  setTimeout(() => { w.focus(); w.print(); }, 300);
 }
 
 // ── Tabs ───────────────────────────────────────────────────────────────────
